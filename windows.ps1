@@ -77,7 +77,7 @@ function Install-VSCode() {
   $exampleName = "hello.tex"
   $exampleAuthor = (Get-WMIObject Win32_UserAccount | Where-Object caption -eq $(whoami)).FullName
   if (-not $exampleAuthor) {
-    $exampleAuthor = $env:USERPROFILE
+    $exampleAuthor = $env:USERNAME
   }
 
   New-Item -ItemType Directory -Path "$workDir" -Force > $null
@@ -89,7 +89,8 @@ function Install-VSCode() {
   Start-BitsTransfer -Source "$vscodeInstallerURL" -Destination "$vscodeInstallerPath"
 
   Write-LabeledOutput "Visual Studio Code" "ダウンロードを完了しました"
-  Write-LabeledOutput "Visual Studio Code" "インストールを開始します"
+  Write-LabeledOutput "Visual Studio Code" "インストールを開始します"nv
+
 
   Start-Process -Wait -NoNewWindow -FilePath "$vscodeInstallerPath" -Args "/VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath"
 
