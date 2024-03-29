@@ -60,6 +60,8 @@ tlpdbopt_install_srcfiles 0
 
   Write-LabeledOutput "TeX Live" "ダウンロードを完了しました"
   Write-LabeledOutput "TeX Live" "インストールを開始します"
+
+  $env:LANG = "C"
   Start-Process -Wait -NoNewWindow -FilePath "$installTLDir/$texLiveInstallerName" -Args "--profile=`"$workDir/$texLiveProfileName`""
 
   Pop-Location
