@@ -92,7 +92,7 @@ function Install-VSCode() {
   Start-BitsTransfer -Source "$vscodeInstallerURL" -Destination "$vscodeInstallerPath"
 
   Write-LabeledOutput "Visual Studio Code" "ダウンロードを完了しました"
-  Write-LabeledOutput "Visual Studio Code" "インストールを開始します"nv
+  Write-LabeledOutput "Visual Studio Code" "インストールを開始します"
 
 
   Start-Process -Wait -NoNewWindow -FilePath "$vscodeInstallerPath" -Args "/VERYSILENT /NORESTART /MERGETASKS=!runcode,desktopicon,addcontextmenufiles,addcontextmenufolders,associatewithfiles,addtopath"
@@ -102,7 +102,7 @@ function Install-VSCode() {
   @"
 {
   "security.workspace.trust.enabled": false,
-  "latex-workshop.latex.recipe.default": "lastUsed"
+  "latex-workshop.latex.recipe.default": "lastUsed",
   "latex-workshop.latex.recipes": [
     {
       "name": "platex and dvipdfmx",

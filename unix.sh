@@ -133,7 +133,7 @@ installVSCode () {
   cat <<- EOS > "$vscodeSettingsDir/$vscodeSettingsName"
   {
     "security.workspace.trust.enabled": false,
-    "latex-workshop.latex.recipe.default": "lastUsed"
+    "latex-workshop.latex.recipe.default": "lastUsed",
     "latex-workshop.latex.recipes": [
       {
         "name": "platex and dvipdfmx",
