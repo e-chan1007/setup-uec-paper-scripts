@@ -5,12 +5,26 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+getHayaTeXURL() {
+  if [[ "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
+    ARCH="arm64"
+  else
+    ARCH="x86_64"
+  fi
+  if isDarwin; then
+    OS="Darwin"
+  else
+    OS="Linux"
+  fi
+  echo "https://github.com/e-chan1007/hayatex/releases/latest/download/hayatex_${OS}_${ARCH}.tar.gz"
+}
+
 existsCommand () {
   command -v $1 > /dev/null 2>&1
 }
 
 isDarwin() {
-  return $(test "$(uname)" == "Darwin")
+  [ "$(uname)" == "Darwin" ]
 }
 
 labeledEcho () {
@@ -31,10 +45,10 @@ yesNoPrompt () {
 userName=${SUDO_USER:-$USER}
 
 texLiveWorkDir="/tmp/install-tl"
-texLiveArchiveURL="http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz"
-texLiveArchiveName="install-tl-unx.tar.gz"
+texLiveArchiveURL=$(getHayaTeXURL)
+texLiveArchiveName="hayatex.tar.gz"
 texLiveProfileName="texlive.profile"
-texLiveInstallerName="install-tl"
+texLiveInstallerName="hayatex"
 
 vscodeWorkDir="/tmp/install-vscode"
 vscodeSettingsName="settings.json"
@@ -63,6 +77,13 @@ else
   vscodeSettingsDir="$homeDir/.config/Code/User"
 fi
 
+texLiveAdditionalArgs=""
+for arg in "$@"; do
+  if [ "$arg" == "--compat" ]; then
+    texLiveAdditionalArgs="--compat"
+  fi
+done
+
 installTeXLive () {
   mkdir -p $texLiveWorkDir
   pushd $texLiveWorkDir > /dev/null
@@ -80,20 +101,17 @@ installTeXLive () {
   tlpdbopt_install_srcfiles 0
 EOS
 
-  labeledEcho "TeX Live" "インストーラーのダウンロードを開始します"
+  labeledEcho "TeX Live" "HayaTeX インストーラーのダウンロードを開始します"
   curl -#Lo $texLiveArchiveName $texLiveArchiveURL
   tar -zxf $texLiveArchiveName
-  installTLDir="$(ls -d * | head -n 1)"
 
   labeledEcho "TeX Live" "ダウンロードを完了しました"
   labeledEcho "TeX Live" "インストールを開始します"
 
-  "$installTLDir/$texLiveInstallerName" --profile="$texLiveWorkDir/$texLiveProfileName"
+  "./$texLiveInstallerName" --profile="$texLiveWorkDir/$texLiveProfileName" $texLiveAdditionalArgs
 
   popd > /dev/null
   rm -rf $texLiveWorkDir
-
-  /usr/local/texlive/????/bin/*/tlmgr path add
 
   labeledEcho "TeX Live" "インストールが完了しました"
 }

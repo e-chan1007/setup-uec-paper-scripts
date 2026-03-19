@@ -6,6 +6,14 @@ function Find-Executable (
   $null -ne (Get-Command -Name $command -ErrorAction SilentlyContinue)
 }
 
+function Get-HayaTeXURL() {
+  $hayatexArch = "x86_64"
+  if ($env:PROCESSOR_ARCHITECTURE.ToLower() -eq "arm64") {
+    $hayatexArch = "arm64"
+  }
+  return "https://github.com/e-chan1007/hayatex/releases/latest/download/hayatex_Windows_$hayatexArch.zip"
+}
+
 function Show-YesNoPrompt([string] $title, [string] $message) {
   $options = [System.Management.Automation.Host.ChoiceDescription[]](
     (New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", "実行する"),
@@ -23,10 +31,10 @@ function Write-LabeledOutput (
   Write-Host "$esc[37;44;1m $label $esc[m $message"
 }
 
-$texLiveArchiveURL = "http://mirror.ctan.org/systems/texlive/tlnet/install-tl.zip"
-$texLiveArchiveName = "install-tl.zip"
+$texLiveArchiveURL = Get-HayaTeXURL
+$texLiveArchiveName = "hayatex.zip"
 $texLiveProfileName = "texlive.profile"
-$texLiveInstallerName = "install-tl-windows.bat"
+$texLiveInstallerName = "hayatex.exe"
 $workDir = "$env:TEMP/install-tl"
 
 $vscodeLocalExePath = "$env:LOCALAPPDATA/Programs/Microsoft VS Code/Code.exe"
@@ -36,6 +44,14 @@ $vscodeInstallerURL = "https://update.code.visualstudio.com/latest/win32-x64/sta
 $vscodeSettingsDir = "$env:APPDATA/Code/User"
 $vscodeSettingsName = "settings.json"
 $vscodeArgvPath = "$env:USERPROFILE/.vscode/argv.json"
+
+$texLiveAdditionalArgs = ""
+foreach ($arg in $args) {
+  if ($arg -eq "--compat") {
+    $texLiveAdditionalArgs = "--compat"
+    break
+  }
+}
 
 function Install-TeXLive () {
   New-Item -ItemType Directory -Path "$workDir" -Force > $null
@@ -54,16 +70,15 @@ tlpdbopt_install_docfiles 0
 tlpdbopt_install_srcfiles 0
 "@ | Out-File $texLiveProfileName -Encoding ascii
 
-  Write-LabeledOutput "TeX Live" "インストーラーのダウンロードを開始します"
+  Write-LabeledOutput "TeX Live" "HayaTeX インストーラーのダウンロードを開始します"
   Start-BitsTransfer -Source $texLiveArchiveURL -Destination $texLiveArchiveName
   Expand-Archive -LiteralPath $texLiveArchiveName -DestinationPath .
-  $installTLDir = (Get-ChildItem -Directory | Select-Object -First 1 -Property FullName).FullName
 
   Write-LabeledOutput "TeX Live" "ダウンロードを完了しました"
   Write-LabeledOutput "TeX Live" "インストールを開始します"
 
   $env:LANG = "C"
-  Start-Process -Wait -NoNewWindow -FilePath "$installTLDir/$texLiveInstallerName" -Args "--profile=`"$workDir/$texLiveProfileName`""
+  Start-Process -Wait -NoNewWindow -FilePath "./$texLiveInstallerName" -Args "--profile=`"$workDir/$texLiveProfileName`" $texLiveAdditionalArgs"
 
   Pop-Location
   Remove-Item -Recurse $workDir
