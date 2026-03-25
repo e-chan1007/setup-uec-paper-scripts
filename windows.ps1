@@ -167,7 +167,7 @@ function Install-VSCode() {
 
   @"
 {
-  "locale": "ja",
+  "locale": "ja"
 }
 "@ | Out-File -FilePath "$vscodeArgvPath" -Encoding ascii
 
