@@ -222,7 +222,7 @@ EOS
 
   cat <<- EOS > "$vscodeArgvPath"
   {
-    "locale": "ja",
+    "locale": "ja"
   }
 EOS
 
